@@ -3,7 +3,7 @@ const logger = require('./utils/logger')
 const express = require('express')
 const mongoose = require('mongoose')
 const blogsRouter = require('./controllers/blogs')
-const { unknownEndpoint, requestLogger } = require('./utils/middleware')
+const { unknownEndpoint, requestLogger, errorHandler } = require('./utils/middleware')
 
 
 const app = express()
@@ -23,5 +23,6 @@ app.use(requestLogger)
 app.use('/api/blogs', blogsRouter)
 
 app.use(unknownEndpoint)
+app.use(errorHandler)
 
 module.exports = app
