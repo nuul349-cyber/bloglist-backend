@@ -1,0 +1,25 @@
+{
+  "name": "blog-list",
+  "version": "0.0.1",
+  "description": "",
+  "license": "MIT",
+  "author": "Nuul",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --watch index.js",
+    "start": "node index.js",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongoose": "^9.5.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "eslint": "^10.2.1",
+    "globals": "^17.5.0"
+  }
+}
