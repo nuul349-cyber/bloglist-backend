@@ -3,7 +3,7 @@ const logger = require('./utils/logger')
 const express = require('express')
 const mongoose = require('mongoose')
 const blogsRouter = require('./controllers/blogs')
-const { unknownEndpoint } = require('./utils/middleware')
+const { unknownEndpoint, requestLogger } = require('./utils/middleware')
 
 
 const app = express()
@@ -18,6 +18,7 @@ mongoose.connect(mongoUrl, { family: 4 })
   })
 
 app.use(express.json())
+app.use(requestLogger)
 
 app.use('/api/blogs', blogsRouter)
 
