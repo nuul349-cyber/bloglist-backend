@@ -64,6 +64,73 @@ const listManyBlogs = [
   }
 ]
 
+const listRepeatedAuthors = [
+  {
+    _id: '5a422aa71b54f676234d17f8',
+    title: 'Title1',
+    author: 'Edsger W. Dijkstra',
+    url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
+    likes: 5,
+    __v: 0
+  },
+  {
+    _id: '5a422aa71b54fs76234d17f8',
+    title: 'Title3',
+    author: 'Ed',
+    url: 'https://hsages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
+    likes: 5,
+    __v: 0
+  },
+  {
+    _id: '5a422aa71b54f6762d4d17f8',
+    title: 'Title2',
+    author: 'Edsger W. Dijkstra',
+    url: 'https://homepages.cwi.nl/dorm/teaching/reader/Dijkstra68.pdf',
+    likes: 2,
+    __v: 0
+  },
+  {
+    _id: '5a422aa71b54fs76234d17f8',
+    title: 'Title3',
+    author: 'Edsger W. Dijkstra',
+    url: 'https://hsages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
+    likes: 5,
+    __v: 0
+  },
+  {
+    _id: '5a422aa71b54fs76234d17f8',
+    title: 'Title3',
+    author: 'Ed',
+    url: 'https://hsages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
+    likes: 5,
+    __v: 0
+  },
+  {
+    _id: '5a422aa71b54fs76234d17f8',
+    title: 'Title3',
+    author: 'Edsger',
+    url: 'https://hsages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
+    likes: 5,
+    __v: 0
+  },
+  {
+    _id: '5a422aa71b54fs76234d17f8',
+    title: 'Title3',
+    author: 'Ed',
+    url: 'https://hsages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
+    likes: 5,
+    __v: 0
+  },
+  {
+    _id: '5a422aa71b54fs76234d17f8',
+    title: 'Title3',
+    author: 'Edsger',
+    url: 'https://hsages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
+    likes: 5,
+    __v: 0
+  },
+]
+
 test('dummy returns one', () => {
   const blogs = []
 
@@ -96,5 +163,23 @@ describe('favorite blog', () => {
 
   test('of a bigger list', () => {
     assert.strictEqual(listHelper.favoriteBlog(listManyBlogs), listManyBlogs[5])
+  })
+})
+
+describe('author with most blogs', () => {
+  test('of an empty list is null', () => {
+    assert.strictEqual(listHelper.mostBlogs([]), null)
+  })
+
+  test('when list has only one', () => {
+    assert.deepStrictEqual(listHelper.mostBlogs(listWithOneBlog), { author:'Edsger W. Dijkstra', blogs:1 })
+  })
+
+  test('when doesn\'t have repeating authors', () => {
+    assert.deepStrictEqual(listHelper.mostBlogs(listManyBlogs), { author:'Edsger W. Dijkstra', blogs:1 })
+  })
+
+  test('when list has repeating authors', () => {
+    assert.deepStrictEqual(listHelper.mostBlogs(listRepeatedAuthors), { author:'Edsger W. Dijkstra', blogs:3 })
   })
 })
