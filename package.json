@@ -9,7 +9,8 @@
   "scripts": {
     "dev": "node --watch index.js",
     "start": "node index.js",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "node --test"
   },
   "dependencies": {
     "dotenv": "^17.4.2",
