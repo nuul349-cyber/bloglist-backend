@@ -70,7 +70,7 @@ const listRepeatedAuthors = [
     title: 'Title1',
     author: 'Edsger W. Dijkstra',
     url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
-    likes: 5,
+    likes: 3,
     __v: 0
   },
   {
@@ -78,7 +78,7 @@ const listRepeatedAuthors = [
     title: 'Title3',
     author: 'Ed',
     url: 'https://hsages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
-    likes: 5,
+    likes: 2,
     __v: 0
   },
   {
@@ -86,7 +86,7 @@ const listRepeatedAuthors = [
     title: 'Title2',
     author: 'Edsger W. Dijkstra',
     url: 'https://homepages.cwi.nl/dorm/teaching/reader/Dijkstra68.pdf',
-    likes: 2,
+    likes: 1,
     __v: 0
   },
   {
@@ -94,7 +94,7 @@ const listRepeatedAuthors = [
     title: 'Title3',
     author: 'Edsger W. Dijkstra',
     url: 'https://hsages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
-    likes: 5,
+    likes: 4,
     __v: 0
   },
   {
@@ -102,7 +102,7 @@ const listRepeatedAuthors = [
     title: 'Title3',
     author: 'Ed',
     url: 'https://hsages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
-    likes: 5,
+    likes: 3,
     __v: 0
   },
   {
@@ -110,7 +110,7 @@ const listRepeatedAuthors = [
     title: 'Title3',
     author: 'Edsger',
     url: 'https://hsages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
-    likes: 5,
+    likes: 2,
     __v: 0
   },
   {
@@ -118,7 +118,7 @@ const listRepeatedAuthors = [
     title: 'Title3',
     author: 'Ed',
     url: 'https://hsages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
-    likes: 5,
+    likes: 2,
     __v: 0
   },
   {
@@ -126,7 +126,7 @@ const listRepeatedAuthors = [
     title: 'Title3',
     author: 'Edsger',
     url: 'https://hsages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
-    likes: 5,
+    likes: 1,
     __v: 0
   },
 ]
@@ -180,6 +180,30 @@ describe('author with most blogs', () => {
   })
 
   test('when list has repeating authors', () => {
-    assert.deepStrictEqual(listHelper.mostBlogs(listRepeatedAuthors), { author:'Edsger W. Dijkstra', blogs:3 })
+    assert.deepStrictEqual(
+      listHelper.mostBlogs(listRepeatedAuthors),
+      { author:'Edsger W. Dijkstra', blogs:3 }
+    )
+  })
+})
+
+describe('author with most likes', () => {
+  test('of an empty list is null', () => {
+    assert.strictEqual(listHelper.mostLikes([]), null)
+  })
+
+  test('when list has only one', () => {
+    assert.deepStrictEqual(listHelper.mostLikes(listWithOneBlog), { author:'Edsger W. Dijkstra', likes:5 })
+  })
+
+  test('when doesn\'t have repeating authors', () => {
+    assert.deepStrictEqual(listHelper.mostLikes(listManyBlogs), { author:'Edsger Dijkstra', likes:9 })
+  })
+
+  test('when list has repeating authors', () => {
+    assert.deepStrictEqual(
+      listHelper.mostLikes(listRepeatedAuthors),
+      { author:'Edsger W. Dijkstra', likes:8 }
+    )
   })
 })
