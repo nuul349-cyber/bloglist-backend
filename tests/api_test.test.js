@@ -86,6 +86,23 @@ test('successfully creates a new blog post', async () => {
   assert(result.length > 0)
 })
 
+test('likes default to 0', async () => {
+  const newBlog = {
+    title: 'New Blog',
+    author: 'New Author',
+    url: 'https://url.com',
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const result = await Blog.find(newBlog)
+  assert.strictEqual(result[0].likes, 0)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
