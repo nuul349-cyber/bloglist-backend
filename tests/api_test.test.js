@@ -1,5 +1,5 @@
 const assert = require('node:assert')
-const { test, after, beforeEach } = require('node:test')
+const { test, after, beforeEach, describe } = require('node:test')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
@@ -133,6 +133,22 @@ test('url required', async () => {
   assert.strictEqual(blogsAfterPost.length, initialBlogs.length)
 })
 
+describe('DELETE method tests', () => {
+  test('succeeds with a valid id', async () => {
+    const blogsAtStart = await Blog.find({})
+    const blogToDelete = blogsAtStart[0]
+
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .expect(204)
+
+    const blogsAfterDeletion = await Blog.find({})
+    const ids = blogsAfterDeletion.map(b => b.id)
+    assert (!ids.includes(blogToDelete.id))
+
+    assert.strictEqual(blogsAfterDeletion.length, initialBlogs.length - 1)
+  })
+})
 after(async () => {
   await mongoose.connection.close()
 })
