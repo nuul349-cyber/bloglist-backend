@@ -103,6 +103,36 @@ test('likes default to 0', async () => {
   assert.strictEqual(result[0].likes, 0)
 })
 
+test('title required', async () => {
+  const newBlog = {
+    author: 'New Author',
+    likes: 321,
+    url: 'https://url.com',
+  }
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+
+  const blogsAfterPost = await Blog.find({})
+  assert.strictEqual(blogsAfterPost.length, initialBlogs.length)
+})
+
+test('url required', async () => {
+  const newBlog = {
+    title: 'New Blog',
+    author: 'New Author',
+    likes: 321,
+  }
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+
+  const blogsAfterPost = await Blog.find({})
+  assert.strictEqual(blogsAfterPost.length, initialBlogs.length)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
