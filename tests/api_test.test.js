@@ -149,6 +149,67 @@ describe('DELETE method tests', () => {
     assert.strictEqual(blogsAfterDeletion.length, initialBlogs.length - 1)
   })
 })
+
+describe('Updating Blogs', () => {
+  test('Updates valid blogs', async () => {
+    const blogsAtStart = await Blog.find({})
+    const blogToUpdate = blogsAtStart[0]
+    const newBlog = {
+      title: blogToUpdate.title,
+      author: blogToUpdate.author,
+      url: blogToUpdate.url,
+      likes: blogToUpdate.likes + 1,
+    }
+
+    await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(newBlog)
+      .expect(200)
+
+    const blogsAfterUpdate = await Blog.find({})
+    assert.strictEqual(blogsAfterUpdate.length, initialBlogs.length)
+
+    const ids = blogsAfterUpdate.map(b => b.id)
+    assert(ids.includes(blogToUpdate.id))
+
+    const updatedBlog = await Blog.findById(blogToUpdate.id)
+    assert.strictEqual(updatedBlog.likes, blogToUpdate.likes + 1)
+  })
+
+  test('Fails on an invalid id', async () => {
+    const invalidId = '67tads'
+    const newBlog = {
+      title: 'invalid',
+      author: 'invalid',
+      url: 'invalid',
+      likes: 0,
+    }
+    await api
+      .put(`/api/blogs/${invalidId}`)
+      .send(newBlog)
+      .expect(400)
+  })
+
+  test('Fails on a valid but unexisting id', async () => {
+    const newBlog = {
+      title: 'invalid',
+      author: 'invalid',
+      url: 'invalid',
+      likes: 0,
+    }
+    const blog = new Blog(newBlog)
+    await blog.save()
+    await blog.deleteOne()
+
+    const nonExistingId = blog._id.toString()
+
+    await api
+      .put(`/api/blogs/${nonExistingId}`)
+      .send(newBlog)
+      .expect(404)
+  })
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
