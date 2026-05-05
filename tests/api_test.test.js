@@ -4,6 +4,8 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
+const bcrypt = require('bcrypt')
+const User = require('../models/user')
 
 const api = supertest(app)
 
@@ -46,91 +48,98 @@ const initialBlogs = [
   }
 ]
 
+const getAllUsers = async () => {
+  let users = await User.find({})
+  return users.map(u => u.toJSON())
+}
+
 beforeEach(async () => {
   await Blog.deleteMany({})
 
   await Blog.insertMany(initialBlogs)
 })
 
-test('all notes are returned', async () => {
-  const response = await api
-    .get('/api/blogs')
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
-  assert.strictEqual(response.body.length, initialBlogs.length)
-})
+describe('Basic tests', () => {
+  test('all notes are returned', async () => {
+    const response = await api
+      .get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    assert.strictEqual(response.body.length, initialBlogs.length)
+  })
 
-test('the unique identifier property of the blog posts is named id', async () => {
-  const response = await api.get('/api/blogs')
-  assert(response.body[0].id)
-})
+  test('the unique identifier property of the blog posts is named id', async () => {
+    const response = await api.get('/api/blogs')
+    assert(response.body[0].id)
+  })
 
-test('successfully creates a new blog post', async () => {
-  const newBlog = {
-    title: 'New Blog',
-    author: 'New Author',
-    url: 'https://url.com',
-    likes: 321,
-  }
+  test('successfully creates a new blog post', async () => {
+    const newBlog = {
+      title: 'New Blog',
+      author: 'New Author',
+      url: 'https://url.com',
+      likes: 321,
+    }
 
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(201)
-    .expect('Content-Type', /application\/json/)
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
 
-  const blogsAfterPost = await Blog.find({})
-  assert.strictEqual(blogsAfterPost.length, initialBlogs.length + 1)
+    const blogsAfterPost = await Blog.find({})
+    assert.strictEqual(blogsAfterPost.length, initialBlogs.length + 1)
 
-  const result = await Blog.find(newBlog)
-  assert(result.length > 0)
-})
+    const result = await Blog.find(newBlog)
+    assert(result.length > 0)
+  })
 
-test('likes default to 0', async () => {
-  const newBlog = {
-    title: 'New Blog',
-    author: 'New Author',
-    url: 'https://url.com',
-  }
+  test('likes default to 0', async () => {
+    const newBlog = {
+      title: 'New Blog',
+      author: 'New Author',
+      url: 'https://url.com',
+    }
 
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(201)
-    .expect('Content-Type', /application\/json/)
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
 
-  const result = await Blog.find(newBlog)
-  assert.strictEqual(result[0].likes, 0)
-})
+    const result = await Blog.find(newBlog)
+    assert.strictEqual(result[0].likes, 0)
+  })
 
-test('title required', async () => {
-  const newBlog = {
-    author: 'New Author',
-    likes: 321,
-    url: 'https://url.com',
-  }
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(400)
+  test('title required', async () => {
+    const newBlog = {
+      author: 'New Author',
+      likes: 321,
+      url: 'https://url.com',
+    }
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
 
-  const blogsAfterPost = await Blog.find({})
-  assert.strictEqual(blogsAfterPost.length, initialBlogs.length)
-})
+    const blogsAfterPost = await Blog.find({})
+    assert.strictEqual(blogsAfterPost.length, initialBlogs.length)
+  })
 
-test('url required', async () => {
-  const newBlog = {
-    title: 'New Blog',
-    author: 'New Author',
-    likes: 321,
-  }
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(400)
+  test('url required', async () => {
+    const newBlog = {
+      title: 'New Blog',
+      author: 'New Author',
+      likes: 321,
+    }
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
 
-  const blogsAfterPost = await Blog.find({})
-  assert.strictEqual(blogsAfterPost.length, initialBlogs.length)
+    const blogsAfterPost = await Blog.find({})
+    assert.strictEqual(blogsAfterPost.length, initialBlogs.length)
+  })
 })
 
 describe('DELETE method tests', () => {
@@ -208,6 +217,100 @@ describe('Updating Blogs', () => {
       .send(newBlog)
       .expect(404)
   })
+})
+
+describe('User creation with one user already in the database' , () => {
+  beforeEach(async () => {
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('sekret', 10)
+    const user = new User({ username: 'root', passwordHash })
+
+    await user.save()
+  })
+
+  test('creation succeeds with a fresh username', async () => {
+    const usersAtStart = await getAllUsers()
+
+    const newUser = {
+      username: 'mluukkai',
+      name: 'Matti Luukkainen',
+      password: 'salainen',
+    }
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await getAllUsers()
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length + 1)
+
+    const usernames = usersAtEnd.map(u => u.username)
+    assert(usernames.includes(newUser.username))
+
+  })
+
+  test('creation fails with proper statuscode and message if username is already taken', async () => {
+    const usersAtStart = await getAllUsers()
+
+    const newUser = {
+      username: 'root',
+      name: 'Superuser',
+      password: 'salainen',
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await getAllUsers()
+    assert(result.body.error.includes('already taken'))
+
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+  })
+
+  test('creation fails if username doesn\'t have proper format', async () => {
+    const usersAtStart = await getAllUsers()
+
+    const newUser1 = {
+      username: 'o',
+      name: 'Superuser',
+      password: 'salainen',
+    }
+
+    await api
+      .post('/api/users')
+      .send(newUser1)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await getAllUsers()
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+  })
+
+  test('creation fails if password doesn\'t have proper format', async () => {
+    const usersAtStart = await getAllUsers()
+
+    const newUser1 = {
+      username: 'propername',
+      name: 'Superuser',
+      password: 'sa',
+    }
+
+    await api
+      .post('/api/users')
+      .send(newUser1)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await getAllUsers()
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+  })
+
 })
 
 after(async () => {
