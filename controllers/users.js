@@ -27,4 +27,11 @@ usersRouter.post('/', async (request, response) => {
   response.status(201).json(savedUser)
 })
 
+
+usersRouter.get('/', async (request, response) => {
+  const users = await User.find({}).populate('blogs', 'title url likes')
+
+  response.json(users)
+})
+
 module.exports = usersRouter
