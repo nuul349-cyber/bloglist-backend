@@ -1,10 +1,10 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QxIiwiaWQiOiI2OWZhNjkyYmQ0NGIzMmVhNzc5YjEwY2QiLCJpYXQiOjE3NzgxMTg0OTUsImV4cCI6MTc3ODEyMjA5NX0._b_4Kda68j0XWuqnAMG-UlJNmvR66DfK6hZEx5vzII0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QxIiwiaWQiOiI2OWZhNjkyYmQ0NGIzMmVhNzc5YjEwY2QiLCJpYXQiOjE3NzgxODU2MTcsImV4cCI6MTc3ODE4OTIxN30.5CAZIYoK0tMqATLmNvhUQhbyxx5dhnNg0KTK6I-GO5E
 
 {
-    "title": "blog with token",
+    "title": "rand title",
     "author": "author something",
     "url": "random URL",
-    "likes": 321
+    "likes": 432
 }

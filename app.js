@@ -19,7 +19,6 @@ mongoose.connect(mongoUrl, { family: 4 })
     logger.error('error conecting to MongoDB: ', error.message)
   })
 
-app.use(middleware.tokenExtractor)
 app.use(express.json())
 app.use(middleware.requestLogger)
 
