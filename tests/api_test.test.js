@@ -6,6 +6,8 @@ const app = require('../app')
 const Blog = require('../models/blog')
 const bcrypt = require('bcrypt')
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
+
 
 const api = supertest(app)
 
@@ -47,6 +49,7 @@ const initialBlogs = [
     likes: 9,
   }
 ]
+let token
 
 const getAllUsers = async () => {
   let users = await User.find({})
@@ -56,7 +59,28 @@ const getAllUsers = async () => {
 beforeEach(async () => {
   await Blog.deleteMany({})
 
-  await Blog.insertMany(initialBlogs)
+  await User.deleteMany({})
+
+  const passwordHash = await bcrypt.hash('sekret', 10)
+  const user = new User({ username: 'root', passwordHash })
+
+  await user.save()
+
+  const userForToken = {
+    username: user.username,
+    id: user._id,
+  }
+
+  token = jwt.sign(
+    userForToken,
+    process.env.SECRET,
+    { expiresIn: 60*60 }
+  )
+
+  for (let blog of initialBlogs) {
+    let blogObject = new Blog({ ...blog, user: user._id })
+    await blogObject.save()
+  }
 })
 
 describe('Basic tests', () => {
@@ -72,6 +96,9 @@ describe('Basic tests', () => {
     const response = await api.get('/api/blogs')
     assert(response.body[0].id)
   })
+})
+
+describe('Blog creation', () => {
 
   test('successfully creates a new blog post', async () => {
     const newBlog = {
@@ -84,6 +111,7 @@ describe('Basic tests', () => {
     await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', `Bearer ${token}`)
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
@@ -104,6 +132,7 @@ describe('Basic tests', () => {
     await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', `Bearer ${token}`)
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
@@ -120,6 +149,7 @@ describe('Basic tests', () => {
     await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', `Bearer ${token}`)
       .expect(400)
 
     const blogsAfterPost = await Blog.find({})
@@ -135,6 +165,7 @@ describe('Basic tests', () => {
     await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', `Bearer ${token}`)
       .expect(400)
 
     const blogsAfterPost = await Blog.find({})
@@ -149,6 +180,7 @@ describe('DELETE method tests', () => {
 
     await api
       .delete(`/api/blogs/${blogToDelete.id}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(204)
 
     const blogsAfterDeletion = await Blog.find({})
