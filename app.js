@@ -5,7 +5,7 @@ const mongoose = require('mongoose')
 const blogsRouter = require('./controllers/blogs')
 const usersRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
-const { unknownEndpoint, requestLogger, errorHandler } = require('./utils/middleware')
+const middleware = require('./utils/middleware')
 
 
 const app = express()
@@ -19,14 +19,15 @@ mongoose.connect(mongoUrl, { family: 4 })
     logger.error('error conecting to MongoDB: ', error.message)
   })
 
+app.use(middleware.tokenExtractor)
 app.use(express.json())
-app.use(requestLogger)
+app.use(middleware.requestLogger)
 
 app.use('/api/blogs', blogsRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
 
-app.use(unknownEndpoint)
-app.use(errorHandler)
+app.use(middleware.unknownEndpoint)
+app.use(middleware.errorHandler)
 
 module.exports = app
