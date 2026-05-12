@@ -16,7 +16,11 @@ const errorHandler = (error, request, response, next) => {
   if (error.name === 'CastError') {
     return response.status(400).send({ error:'malformed id' })
   } else if(error.name === 'ValidationError') {
-    return response.status(400).json({ error: error.message })
+    const errorMessages = []
+    for(let key of Object.keys(error.errors)) {
+      errorMessages.push(error.errors[key].properties.message)
+    }
+    return response.status(400).json({ error: errorMessages.join(', ') })
   } else if (error.name === 'MongoServerError' && error.message.includes('E11000 duplicate key error')) {
     return response.status(400).json({ error: `username '${error.keyValue.username}' already taken` })
   } else if (error.name === 'JsonWebTokenError') {

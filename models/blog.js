@@ -1,9 +1,9 @@
 const mongoose = require('mongoose')
 
 const blogSchema = new mongoose.Schema({
-  title: { type: String, required: true },
+  title: { type: String, required: [true, 'Title should not be empty'] },
   author: String,
-  url: { type: String, required: true },
+  url: { type: String, required: [true, 'URL should not be empty'] },
   likes: { type: Number, default: 0 },
   user: {
     type: mongoose.Schema.Types.ObjectId,
