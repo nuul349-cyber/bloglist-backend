@@ -27,7 +27,7 @@ const errorHandler = (error, request, response, next) => {
     return response.status(401).json({ error: 'token invalid' })
   } else if (error.name === 'TokenExpiredError') {
     return response.status(401).json({
-      error: 'token expired'
+      error: 'the session has expired'
     })
   }
   next(error)
